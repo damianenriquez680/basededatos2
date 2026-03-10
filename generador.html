@@ -1,23 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de alumnos</title>
+    <title>Generador de Alumnos Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="./functions.js"></script>
+    <style>
+        #salida {
+            white-space: pre-wrap; 
+            font-family: monospace;
+        }
+    </style>
 </head>
-<body>
-    numero de registros: <input type="number" id="registros" value="1" min="1" max="50000">
-    <input type="button" value="Registros 1" onclick="document.getElementById('registros').value=1;">
-    <input type="button" value="Registros 50000" onclick="document.getElementById('registros').value=50000;">
-    tipo de archivo <Select id="opcion">
-        <option value="1">SQL MySQL/MariaDB</option>
-        <option value="2">Postgresql</option>
-        <option value="3">CSV</option>
-        <option value="4">JSON</option>
-    </Select>
-    <input type="button" value="Generar" onclick="generar()">
-      <input type="button" value="Guardar" onclick="guardarArchivo()">
-    <p id="salida"></p>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">🎓 Generador de Datos Estudiantiles</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Número de registros</label>
+                    <div class="flex gap-2 mt-1">
+                        <input type="number" id="registros" value="10" min="1" max="50000" 
+                               class="block w-full rounded-md border-gray-300 border p-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="document.getElementById('registros').value=1" class="text-xs bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">Min (1)</button>
+                        <button onclick="document.getElementById('registros').value=50000" class="text-xs bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">Max (50k)</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Formato de salida</label>
+                    <select id="opcion" class="mt-1 block w-full rounded-md border-gray-300 border p-2 focus:ring-blue-500">
+                        <option value="1">SQL MySQL / MariaDB</option>
+                        <option value="2">PostgreSQL</option>
+                        <option value="3">CSV (Excel)</option>
+                        <option value="4">JSON</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-col justify-end gap-3">
+                <button onclick="generar()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                    ⚡ Generar Registros
+                </button>
+                <button onclick="guardarArchivo()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                    💾 Descargar Archivo
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Vista Previa:</h2>
+            <div class="bg-gray-900 text-green-400 p-4 rounded-lg h-64 overflow-y-auto text-sm shadow-inner">
+                <pre id="salida">Los datos generados aparecerán aquí...</pre>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

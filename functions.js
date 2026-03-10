@@ -73,43 +73,36 @@ function generar() {
  
     }
 }
- 
-function generarSQL() {
-     salida = "INSERT INTO alumnos VALUES ";
+ function generarSQL() {
+    salida = `CREATE DATABASE IF NOT EXISTS sistema_escolar;\nUSE sistema_escolar;\n\n` +
+             `CREATE TABLE IF NOT EXISTS alumnos (\n` +
+             `  expediente int NOT NULL,\n` +
+             `  app1 varchar(255) NOT NULL,\n` +
+             `  app2 varchar(255) DEFAULT NULL,\n` +
+             `  nombres varchar(255) NOT NULL,\n` +
+             `  correo varchar(255) NOT NULL,\n` +
+             `  UNIQUE KEY expediente (expediente),\n` +
+             `  UNIQUE KEY correo (correo)\n` +
+             `) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\n` +
+             `INSERT INTO alumnos (expediente, app1, app2, nombres, correo) VALUES `;
+
     var matricula = 224250000;
-    var nombre = "";
-    var registros = 0;
-    registros = document.getElementById('registros').value;
-    var nombreFrances = "";
+    var registros = document.getElementById('registros').value;
+
     for (let i = 0; i < registros; i++) {
         let apellidoMex = apellidosMexico[Math.floor(Math.random() * apellidosMexico.length)];
         let apellidoRuso = apellidosRusos[Math.floor(Math.random() * apellidosRusos.length)];
-        let tieneSegundoNombre = Math.random() < 0.5;
-        console.log(tieneSegundoNombre);
-        let segundoApellido;
-        if (apellidoRuso === "NULL") {
-            segundoApellido = "NULL";
-        } else {
-            segundoApellido = `UPPER('${apellidoRuso}')`;
-        }
-        nombre = "";
-        nombreFrances = "";
-        if (tieneSegundoNombre == 0) {
-            nombre = nombresMexicanos[Math.floor(Math.random() * nombresMexicanos.length)];
-        } else {
-            nombre = nombresMexicanos[Math.floor(Math.random() * nombresMexicanos.length)];
-            nombreFrances = nombresFranceses[Math.floor(Math.random() * nombresFranceses.length)];
-            nombre += ` ${nombreFrances}`;
-        }
+        let nombreMex = nombresMexicanos[Math.floor(Math.random() * nombresMexicanos.length)];
+        let nombreFran = nombresFranceses[Math.floor(Math.random() * nombresFranceses.length)];
+        
+        let nombreCompleto = Math.random() < 0.5 ? nombreMex : `${nombreMex} ${nombreFran}`;
+        let segundoApellido = (apellidoRuso === "NULL") ? "NULL" : `'${apellidoRuso.toUpperCase()}'`;
 
-        if (i < registros - 1) {
-            salida += `<br>(${matricula + i},UPPER('${apellidoMex}'), ${segundoApellido}, '${nombre}','a${matricula + i}@unison.mx'),`;
-        } else {
-            salida += `<br>(${matricula + i},UPPER('${apellidoMex}'), ${segundoApellido}, '${nombre}','a${matricula + i}@unison.mx');`;
-        }
+        salida += `\n(${matricula + i}, '${apellidoMex.toUpperCase()}', ${segundoApellido}, '${nombreCompleto}', 'a${matricula + i}@unison.mx')${i == registros - 1 ? ';' : ','}`;
     }
-    document.getElementById("salida").innerHTML = salida;
+    document.getElementById("salida").innerText = salida;
 }
+
 
 function generarSQLpostgresql() {
  
@@ -201,23 +194,27 @@ function generarJSON() {
 }
  
 function guardarArchivo() {
-        var var1 = document.createElement("a");
-        //salida = salida.replaceAll("", "\r\n");
-        var1.setAttribute("href","data:text/plain;charset=UTF-8," + encodeURIComponent(salida));
-       
-        var opcion = document.getElementById("opcion").value;
- 
+    if (!salida) return alert("Primero genera los datos");
+
+    var opcion = document.getElementById("opcion").value;
+    var nombreArchivo = "alumnos";
+    var mimeType = "text/plain";
+
     switch (opcion) {
-        case "1": var1.setAttribute("download", "sistema_escolar.sql");alert("Generando archivo SQL");break;
-        case "2":var1.setAttribute("download", "sistema_escolar.sql");alert("Generando archivo Postgres");break;
-        case "3":var1.setAttribute("download", "sistema_escolar.csv");alert("Generando archivo CSV");break;
-        case "4":var1.setAttribute("download", "sistema_escolar.json");alert("Generando archivo JSON");break;
- 
+        case "1": case "2": nombreArchivo += ".sql"; break;
+        case "3": nombreArchivo += ".csv"; break;
+        case "4": nombreArchivo += ".json"; mimeType = "application/json"; break;
     }
- 
-    var1.style.display = "none";
-    document.body.appendChild(var1);
-    var1.click();
-    document.body.removeChild(var1);
- 
+
+    const blob = new Blob([salida], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = nombreArchivo;
+    document.body.appendChild(link);
+    link.click();
+    
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 }
